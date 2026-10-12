@@ -28,11 +28,43 @@ it('lists patients with their health unit and filters by partial name', function
 
     $response
         ->assertOk()
-        ->assertJsonCount(1)
-        ->assertJsonPath('0.name', 'Ana Maria')
-        ->assertJsonPath('0.health_unit.id', $healthUnit->id)
-        ->assertJsonPath('0.health_unit.name', 'UBS Centro')
-        ->assertJsonMissingPath('0.health_unit.city');
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Ana Maria')
+        ->assertJsonPath('data.0.health_unit.id', $healthUnit->id)
+        ->assertJsonPath('data.0.health_unit.name', 'UBS Centro')
+        ->assertJsonMissingPath('data.0.health_unit.city')
+        ->assertJsonPath('current_page', 1)
+        ->assertJsonPath('last_page', 1)
+        ->assertJsonPath('per_page', 10)
+        ->assertJsonPath('total', 1);
+});
+
+it('paginates patients ten per page', function () {
+    $healthUnit = HealthUnit::create([
+        'name' => 'UBS Centro',
+        'city' => 'São Luís',
+    ]);
+
+    foreach (range(1, 11) as $index) {
+        Patient::create([
+            'name' => sprintf('Paciente %02d', $index),
+            'cpf' => str_pad((string) $index, 11, '0', STR_PAD_LEFT),
+            'birth_date' => '1990-01-01',
+            'health_unit_id' => $healthUnit->id,
+        ]);
+    }
+
+    $response = $this->getJson('/api/patients?page=2');
+
+    $response
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Paciente 11')
+        ->assertJsonPath('data.0.health_unit.name', 'UBS Centro')
+        ->assertJsonPath('current_page', 2)
+        ->assertJsonPath('last_page', 2)
+        ->assertJsonPath('per_page', 10)
+        ->assertJsonPath('total', 11);
 });
 
 it('creates a patient and returns 201', function () {

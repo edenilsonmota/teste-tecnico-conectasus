@@ -26,7 +26,7 @@ class PatientController extends Controller
             })
             ->orderBy('name')
             ->orderBy('id')
-            ->get();
+            ->paginate(10);
 
         return response()->json($patients);
     }
