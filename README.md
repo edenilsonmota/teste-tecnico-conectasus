@@ -34,3 +34,11 @@ php artisan serve
 ```
 
 Aplicação disponível em `http://127.0.0.1:8000`.
+
+## Como testar
+
+Os testes são escritos com Pest, para testes da API de pacientes e unidades de saúde, pasta `src` execute:
+
+```bash
+php artisan test --compact tests/Feature/Http/Controllers
+```

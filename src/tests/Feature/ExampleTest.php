@@ -1,7 +1,12 @@
 <?php
 
-test('the application returns a successful response', function () {
+test('the patient management page is displayed', function () {
     $response = $this->get('/');
 
-    $response->assertStatus(200);
+    $response
+        ->assertOk()
+        ->assertViewIs('patients')
+        ->assertSee('Cadastro de Pacientes')
+        ->assertSee(asset('css/patients.css'), escape: false)
+        ->assertSee(asset('js/patients.js'), escape: false);
 });
